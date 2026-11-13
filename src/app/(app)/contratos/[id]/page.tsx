@@ -245,6 +245,16 @@ export default async function ContratoPage({
             Sem configuração tributária, tributos e encargos valem zero. <Link href="/config-tributaria">Configurar agora</Link>.
           </p>
         )}
+        {config && regime === "Simples" && !(config.das > 0) && (
+          <p className="erro">
+            Regime Simples com DAS zerado: nenhum tributo está sendo descontado. <Link href="/config-tributaria">Revisar configuração</Link>.
+          </p>
+        )}
+        {config && regime === "Presumido" && (!(config.presuncao_irpj > 0) || !(config.presuncao_csll > 0)) && (
+          <p className="erro">
+            Lucro Presumido sem percentual de presunção: IRPJ e CSLL estão zerados. <Link href="/config-tributaria">Revisar configuração</Link>.
+          </p>
+        )}
         <table className="dre">
           <tbody>
             <tr><td>Receita</td><td className="num">{moeda(d.receita)}</td></tr>

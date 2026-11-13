@@ -228,6 +228,16 @@ export async function salvarConfigTributaria(form: FormData) {
     if (v < 0) falhar("/config-tributaria", "Os percentuais não podem ser negativos.");
     dados[c] = v;
   }
+  // Campos que zerariam o cálculo sem o usuário perceber
+  if (regime === "Simples" && !(Number(dados.das) > 0)) {
+    falhar("/config-tributaria", "No Simples, informe a alíquota efetiva do DAS.");
+  }
+  if (regime === "Presumido" && (!(Number(dados.presuncao_irpj) > 0) || !(Number(dados.presuncao_csll) > 0))) {
+    falhar("/config-tributaria", "No Lucro Presumido, informe a presunção do IRPJ e da CSLL (serviços: 32).");
+  }
+  if (regime !== "Simples" && !(Number(dados.irpj) > 0) && !(Number(dados.csll) > 0)) {
+    falhar("/config-tributaria", "Informe as alíquotas de IRPJ e CSLL.");
+  }
   const { error } = await supabase.from("config_tributaria").upsert(dados, { onConflict: "empresa_id" });
   if (error) falhar("/config-tributaria", error.message);
   revalidatePath("/config-tributaria");
